@@ -75,6 +75,8 @@
     <Compile Include="Infect\InfectedParty.cs" />
     <Compile Include="Infect\InfectPatch.cs" />
     <Compile Include="Infect\SubModule.cs" />
+    <Compile Include="Infect\UnitConfig.cs" />
+    <Compile Include="Infect\UnitInfectUnit.cs" />
     <Compile Include="MCMSettings\MCMSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

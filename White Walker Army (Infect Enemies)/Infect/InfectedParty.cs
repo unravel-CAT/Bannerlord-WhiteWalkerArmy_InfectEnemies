@@ -16,6 +16,7 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.Localization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace White_Walker_Army__Infect_Enemies_.Infect
 {
@@ -23,7 +24,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
     {
         public InfectedParty(PartyBase affectorParty)
         {
-            if (affectorParty.MobileParty.IsBandit)
+            if (affectorParty.MobileParty.IsBandit || affectorParty.MobileParty.IsBanditBossParty)
             {
                 CreateBanditParty(affectorParty);
             }
@@ -43,7 +44,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             {
                 CreateGarrisonParty(affectorParty);
             }
-            else if (affectorParty.MobileParty.IsLordParty)
+            else
             {
                 CreateLordParty(affectorParty);
             }
@@ -60,7 +61,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
 
         public void CreateLordParty(PartyBase affectorParty)
         {
-            PartyComponent.OnPartyComponentCreatedDelegate initParty = delegate (MobileParty party)
+            PartyComponent.OnPartyComponentCreatedDelegate initParty  = delegate (MobileParty party)
             {
                 party.ChangePartyLeader(affectorParty.MobileParty.LeaderHero);
                 party.ActualClan = affectorParty.MobileParty.ActualClan;
@@ -74,7 +75,14 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         public void CreateBanditParty(PartyBase affectorParty)
         {
             BanditPartyComponent banditPartyComponent = affectorParty.MobileParty.BanditPartyComponent;
-            _party = BanditPartyComponent.CreateBanditParty("infected_party", banditPartyComponent.Clan, banditPartyComponent.Hideout, banditPartyComponent.IsBossParty);
+            if (banditPartyComponent.Hideout == null)
+            {
+                _party = BanditPartyComponent.CreateLooterParty("infected_party", banditPartyComponent.Clan, banditPartyComponent.HomeSettlement, banditPartyComponent.IsBossParty);
+            }
+            else
+            {
+                _party = BanditPartyComponent.CreateBanditParty("infected_party", banditPartyComponent.Clan, banditPartyComponent.Hideout, banditPartyComponent.IsBossParty);
+            }
             InitParty();
         }
 

@@ -68,16 +68,16 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             if (enablePlayer && affectorAgent.IsMainAgent)
                 return true;
             // PlayerTeamHero
-            if (enablePlayerTeamHero && affectorAgent.IsHero && !affectorAgent.IsMainAgent && affectorAgent.Team.IsPlayerTeam)
+            if (enablePlayerTeamHero && affectorAgent.IsHero && !affectorAgent.IsMainAgent && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
                 return true;
             // PlayerTeamSolider
-            if (enablePlayerTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerTeam)
+            if (enablePlayerTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
                 return true;
             //AllyTeamHero
-            if (enableAllyTeamHero && affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly)
+            if (enableAllyTeamHero && affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
                 return true;
             // AllyTeamSolider
-            if (enableAllyTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly)
+            if (enableAllyTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
                 return true;
             // EnemyTeamHero
             if (enableEnemyTeamHero && affectorAgent.IsHero && affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide.OtherSide)

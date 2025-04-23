@@ -31,49 +31,79 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
 
             if (!InfectPatch.infectedTroopCanInfectOthers && affectorParty.Id.Contains("infected_troop")) return;
             if (!InfectPatch.infectedTroopCanBeInfectedAgain && affectedParty.Id.Contains("infected_troop")) return;
-            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 1500)
+            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 2000)
             {
+                if (affectorAgent.Character.IsPlayerCharacter)
+                {
+                    string[] playerInfectedTroopId = {
+                        "Apocalypse_Palace_Guards",
+                        "Apocalypse_Hawkeye_Ranger",
+                        "Apocalypse_Armored_Cavalry",
+                        "Apocalypse_Royal_Archers"
+                    };
+                    int index = random.Next(playerInfectedTroopId.Length);
+                    finalInfectedTroopId = playerInfectedTroopId[index];
+                }
+                else if (affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty && affectorAgent.IsHero && !affectorAgent.Character.IsPlayerCharacter)
+                {
+                    finalInfectedTroopId = "Apocalypse_Believers";
+                }
                 CharacterObject @object = MBObjectManager.Instance.GetObject<CharacterObject>(finalInfectedTroopId);
 
                 // Party
-                if (affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide)
+                try
                 {
-                    isPlayerSide = true;
-                    if (infectedPartyHasCreated_PlayerSide == false)
+                    if (affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide)
                     {
-                        infectedPartyHasCreated_PlayerSide = true;
-                        infectedMobileParty_PlayerSide = new InfectedParty(affectorParty)._party;
-                        infectedPartyBase_PlayerSide = new PartyBase(infectedMobileParty_PlayerSide);
+                        isPlayerSide = true;
+                        if (infectedPartyHasCreated_PlayerSide == false)
+                        {
+                            infectedPartyHasCreated_PlayerSide = true;
+                            infectedMobileParty_PlayerSide = new InfectedParty(affectorParty)._party;
+                            if (affectedParty.IsMobile)
+                                infectedPartyBase_PlayerSide = new PartyBase(infectedMobileParty_PlayerSide);
+                            else
+                                infectedPartyBase_PlayerSide = new PartyBase(infectedMobileParty_PlayerSide.HomeSettlement);
+                        }
+                        else
+                        {
+                            infectedPartyBase_PlayerSide.AddElementToMemberRoster(@object, 1, true);
+                        }
+                        infectedPartyBase_PlayerSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide;
+                        infectedPartyBase_Now = infectedPartyBase_PlayerSide;
                     }
                     else
                     {
-                        infectedPartyBase_PlayerSide.AddElementToMemberRoster(@object, 1, true);
+                        isPlayerSide = false;
+                        if (infectedPartyHasCreated_OtherSide == false)
+                        {
+                            infectedPartyHasCreated_OtherSide = true;
+                            infectedMobileParty_OtherSide = new InfectedParty(affectorParty)._party;
+                            if (affectedParty.IsMobile)
+                                infectedPartyBase_OtherSide = new PartyBase(infectedMobileParty_OtherSide);
+                            else
+                                infectedPartyBase_OtherSide = new PartyBase(infectedMobileParty_OtherSide.HomeSettlement);
+                        }
+                        else
+                        {
+                            infectedPartyBase_OtherSide.AddElementToMemberRoster(@object, 1, true);
+                        }
+                        infectedPartyBase_OtherSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide.OtherSide;
+                        infectedPartyBase_Now = infectedPartyBase_OtherSide;
                     }
-                    infectedPartyBase_PlayerSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide;
-                    infectedPartyBase_Now = infectedPartyBase_PlayerSide;
                 }
-                else
+                catch
                 {
-                    isPlayerSide = false;
-                    if (infectedPartyHasCreated_OtherSide == false)
-                    {
-                        infectedPartyHasCreated_OtherSide = true;
-                        infectedMobileParty_OtherSide = new InfectedParty(affectorParty)._party;
-                        infectedPartyBase_OtherSide = new PartyBase(infectedMobileParty_OtherSide);
-                    }
-                    else
-                    {
-                        infectedPartyBase_OtherSide.AddElementToMemberRoster(@object, 1, true);
-                    }
-                    infectedPartyBase_OtherSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide.OtherSide;
-                    infectedPartyBase_Now = infectedPartyBase_OtherSide;
+
                 }
 
                 // Agent
                 PartyAgentOrigin troopOrigin = new PartyAgentOrigin(infectedPartyBase_Now, @object, -1, default(UniqueTroopDescriptor), false);
                 Agent agent = Mission.Current.SpawnTroop(troopOrigin, isPlayerSide, false, enableMount && @object.HasMount(), false, 1, 1, true, true, false, null, null, null, null, FormationClass.NumberOfAllFormations, false);
                 agent.TeleportToPosition(affectedAgent.Position);
-                //agent.Character.IsFemale = true;
+                agent.Character.IsFemale = true;
+                agent.SetClothingColor1(Color.Black.ToUnsignedInteger());
+                agent.SetClothingColor2(Color.Black.ToUnsignedInteger());
                 agent.ChangeMorale(100f);
                 if (durations > 0)
                 {
@@ -82,6 +112,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 }
             }
         }
+
         public static PartyBase GetaffectorParty(Agent affectorAgent)
         {
             PartyBase result = null;
@@ -114,5 +145,6 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         private static PartyBase infectedPartyBase_PlayerSide = null;
         private static PartyBase infectedPartyBase_OtherSide = null;
         private static PartyBase infectedPartyBase_Now = null;
+        private static readonly Random random = new Random();
     }
 }
