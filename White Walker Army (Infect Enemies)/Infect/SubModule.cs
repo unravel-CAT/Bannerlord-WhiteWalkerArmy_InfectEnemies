@@ -17,12 +17,12 @@ using System.Reflection;
 using System.IO;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.MapEvents;
+using TaleWorlds.CampaignSystem.TournamentGames;
 
 namespace White_Walker_Army__Infect_Enemies_.Infect
 {
     public class SubModule : MBSubModuleBase
     {
-        public static UnitUnitConfig UnitUnitConfig { get; private set; }
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
@@ -33,6 +33,15 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         public override void OnMissionBehaviorInitialize(Mission mission)
         {
             base.OnMissionBehaviorInitialize(mission);
+            mission.AddMissionBehavior(new RemovePartyLogic());
+            for (int i = 0; i < Campaign.Current.MobileParties.Count; ++i)
+            {
+                MobileParty mobileParty = Campaign.Current.MobileParties[i];
+                if (mobileParty.Party.Id.ToString().Contains("infected_troop"))
+                {
+                    InformationManager.DisplayMessage(new InformationMessage(mobileParty.Party.Id.ToString()));
+                }
+            }
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
@@ -47,8 +56,6 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 }
             }
         }
-
-
         private static void LoadConfig()
         {
             if (File.Exists(SubModule.UnitUnitConfigFilePath))
@@ -64,6 +71,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             }
         }
 
+        public static UnitUnitConfig UnitUnitConfig { get; private set; }
         private static readonly string UnitUnitConfigFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "unit_unit_config.json");
     }
 }

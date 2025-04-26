@@ -55,7 +55,6 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             _party.SetCustomName(new TextObject("{=WWA_Infected_Troop}Infected Troop", null));
             _party.SetPartyObjective(MobileParty.PartyObjective.Aggressive);
             _party.SetPartyUsedByQuest(true);
-            _party.Party.SetVisualAsDirty();
             _party.Aggressiveness = 100f;
         }
 

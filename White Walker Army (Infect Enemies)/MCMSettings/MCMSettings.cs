@@ -8,6 +8,7 @@ using MCM;
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Base.Global;
+using MCM.Common;
 using TaleWorlds.Localization;
 
 namespace White_Walker_Army__Infect_Enemies_.MCMSettings
@@ -108,6 +109,20 @@ namespace White_Walker_Army__Infect_Enemies_.MCMSettings
         [SettingPropertyBool("{=WWA_ITCBIA}Infected Troop Can Be Infected Again", HintText = "{=WWA_ITCBIA_Hint}Be careful, turning it on may cause a snowball effect[ Default: OFF ].", Order = 3, RequireRestart = true)]
         [SettingPropertyGroup("Settings")]
         public bool InfectedTroopCanbeInfectedAgain { get; set; } = false;
+
+        [SettingPropertyBool("{=WWA_ITCLM}Infected Troop Contour Line Marking", HintText = "{=WWA_ITCLM_Hint}Infected units will be marked with a blue outline[ Default: ON ].", Order = 4, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public bool InfectedTroopContourLintMarking { get; set; } = true;
+
+        [SettingPropertyDropdown("{=WWA_PITCLM}PlayerSide Infected Troop Contour Line Marking", HintText = "{=WWA_PITCLM_Hint}PlayerSide Infected units will be marked with an outline of the selected color.", Order = 4, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public Dropdown<String> PlayerSideInfectedTroopContourLineMarking { get; set; } = new Dropdown<string>(new string[]
+        {"None", "Black", "White", "Red", "Yellow", "Green", "Blue", "Cyan", "Magenta", "Gray",}, selectedIndex: 6);
+
+        [SettingPropertyDropdown("{=WWA_EITCLM}EnemySide Infected Troop Contour Line Marking", HintText = "{=WWA_EITCLM_Hint}EnemySide Infected units will be marked with an outline of the selected color.", Order = 5, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public Dropdown<String> EnemySideInfectedTroopContourLineMarking { get; set; } = new Dropdown<string>(new string[]
+        {"None", "Black", "White", "Red", "Yellow", "Green", "Blue", "Cyan", "Magenta", "Gray",}, selectedIndex: 6);
 
         //[SettingPropertyBool("{=WWA_CIH}Can Infect Hero", HintText = "{=WWA_CIH_Hint}Hero can be infected[ Default: OFF ].", Order = 4, RequireRestart = true)]
         //[SettingPropertyGroup("Settings")]

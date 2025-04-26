@@ -11,6 +11,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.ObjectSystem;
 
 namespace White_Walker_Army__Infect_Enemies_.Infect
 {
@@ -30,6 +31,14 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             }
         }
 
+        public override void OnAgentRemoved(Agent affectedAgent, Agent affectorAgent, AgentState agentState, KillingBlow blow)
+        {
+            base.OnAgentRemoved(affectedAgent, affectorAgent, agentState, blow);
+            affectedAgent.AgentVisuals.SetContourColor(null);
+            if (affectedAgent.HasMount && affectedAgent.MountAgent != null)
+                affectedAgent.MountAgent.AgentVisuals?.SetContourColor(null);
+        }
+
         public override void OnMissionTick(float dt)
         {
             _durations -= dt;
@@ -46,21 +55,9 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 }
             }
         }
-
-        protected override void OnEndMission()
-        {
-            for (int i = 0; i < Campaign.Current.MobileParties.Count; ++i)
-            {
-                MobileParty mobileParty = Campaign.Current.MobileParties[i];
-                if (mobileParty.Party.Id.ToString().Contains("infected_troop"))
-                {
-                    Campaign.Current.MobileParties.Remove(mobileParty);
-                }
-            }
-        }
-
+      
         private float _durations;
         private readonly Agent _agent;
-        public bool _hasFadOut;
+        private bool _hasFadOut;
     }
 }

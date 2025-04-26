@@ -1,22 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaleWorlds.CampaignSystem.AgentOrigins;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
-using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.Library;
-using TaleWorlds.CampaignSystem.MapEvents;
-using TaleWorlds.CampaignSystem.Encounters;
-using TaleWorlds.CampaignSystem.Party.PartyComponents;
-using TaleWorlds.Localization;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Contexts;
 
 namespace White_Walker_Army__Infect_Enemies_.Infect
 {
@@ -27,13 +16,13 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             string finalInfectedTroopId = affectedAgent.Character.StringId;
             PartyBase affectorParty = GetaffectorParty(affectorAgent);
             PartyBase affectedParty = GetaffectorParty(affectedAgent);
-            //InformationManager.DisplayMessage(new InformationMessage(affectorParty.Id.ToString() + ": " + affectorParty.Name.ToString()));
 
             if (!InfectPatch.infectedTroopCanInfectOthers && affectorParty.Id.Contains("infected_troop")) return;
             if (!InfectPatch.infectedTroopCanBeInfectedAgain && affectedParty.Id.Contains("infected_troop")) return;
-            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 2000)
+
+            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 1500)
             {
-                if (affectorAgent.Character.IsPlayerCharacter)
+                if (affectorAgent.Character.IsPlayerCharacter || affectorAgent.Name.Contains("女神"))
                 {
                     string[] playerInfectedTroopId = {
                         "Apocalypse_Palace_Guards",
@@ -47,6 +36,20 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 else if (affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty && affectorAgent.IsHero && !affectorAgent.Character.IsPlayerCharacter)
                 {
                     finalInfectedTroopId = "Apocalypse_Believers";
+                }
+
+                if (affectedAgent.Character.StringId.Contains("Apocalypse"))
+                {
+                    string[] InfectedTroopId = {
+                        "aserai_vanguard_faris",
+                        "battanian_fian_champion",
+                        "imperial_elite_cataphract",
+                        "khuzait_khans_guard",
+                        "druzhinnik_champion",
+                        "vlandian_banner_knight"
+                    };
+                    int index = random.Next(InfectedTroopId.Length);
+                    finalInfectedTroopId = InfectedTroopId[index];
                 }
                 CharacterObject @object = MBObjectManager.Instance.GetObject<CharacterObject>(finalInfectedTroopId);
 
@@ -69,7 +72,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                         {
                             infectedPartyBase_PlayerSide.AddElementToMemberRoster(@object, 1, true);
                         }
-                        infectedPartyBase_PlayerSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide;
+                        //infectedPartyBase_PlayerSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide;
                         infectedPartyBase_Now = infectedPartyBase_PlayerSide;
                     }
                     else
@@ -88,7 +91,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                         {
                             infectedPartyBase_OtherSide.AddElementToMemberRoster(@object, 1, true);
                         }
-                        infectedPartyBase_OtherSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide.OtherSide;
+                        //infectedPartyBase_OtherSide.MapEventSide = MobileParty.MainParty.Party.MapEventSide.OtherSide;
                         infectedPartyBase_Now = infectedPartyBase_OtherSide;
                     }
                 }
@@ -102,9 +105,60 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 Agent agent = Mission.Current.SpawnTroop(troopOrigin, isPlayerSide, false, enableMount && @object.HasMount(), false, 1, 1, true, true, false, null, null, null, null, FormationClass.NumberOfAllFormations, false);
                 agent.TeleportToPosition(affectedAgent.Position);
                 agent.Character.IsFemale = true;
-                agent.SetClothingColor1(Color.Black.ToUnsignedInteger());
-                agent.SetClothingColor2(Color.Black.ToUnsignedInteger());
-                agent.ChangeMorale(100f);
+                agent.Formation?.SetMovementOrder(MovementOrder.MovementOrderCharge);
+
+                // Apperance
+                if (isPlayerSide && InfectPatch.playerSideInfectedTroopContourLineMarking != "None")
+                {
+                    uint color = 0;
+                    switch (InfectPatch.playerSideInfectedTroopContourLineMarking)
+                    {
+                        case "Black": color = Colors.Black.ToUnsignedInteger(); break;
+                        case "White": color = Colors.White.ToUnsignedInteger(); break;
+                        case "Red": color = Colors.Red.ToUnsignedInteger(); break;
+                        case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
+                        case "Green": color = Colors.Green.ToUnsignedInteger(); break;
+                        case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
+                        case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
+                        case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
+                        case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
+                    }
+                    MBAgentVisuals agentVisuals = agent.AgentVisuals;
+                    agentVisuals?.SetContourColor(new uint?(color), true);
+                    Agent mountAgent = agent.MountAgent;
+                    if (mountAgent != null)
+                    {
+                        MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
+                        mountAgentVisuals?.SetContourColor(new uint?(color), true);
+                    }
+                }
+
+                if (!isPlayerSide && InfectPatch.enemySideInfectedTroopContourLineMarking != "None")
+                {
+                    uint color = 0;
+                    switch (InfectPatch.enemySideInfectedTroopContourLineMarking)
+                    {
+                        case "Black": color = Colors.Black.ToUnsignedInteger(); break;
+                        case "White": color = Colors.White.ToUnsignedInteger(); break;
+                        case "Red": color = Colors.Red.ToUnsignedInteger(); break;
+                        case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
+                        case "Green": color = Colors.Green.ToUnsignedInteger(); break;
+                        case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
+                        case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
+                        case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
+                        case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
+                    }
+                    MBAgentVisuals agentVisuals = agent.AgentVisuals;
+                    agentVisuals?.SetContourColor(new uint?(color), true);
+                    Agent mountAgent = agent.MountAgent;
+                    if (mountAgent != null)
+                    {
+                        MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
+                        mountAgentVisuals?.SetContourColor(new uint?(color), true);
+                    }
+                }
+
+                // AgentFadOut
                 if (durations > 0)
                 {
                     AgentFadOutMissionBehaviour agentFadOutMissionBehaviour = new AgentFadOutMissionBehaviour(agent, durations);

@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using MCM.Abstractions.Base.Global;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.MapEvents;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.TournamentGames;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using White_Walker_Army__Infect_Enemies_.MCMSettings;
@@ -38,23 +41,27 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         public static int durations = GlobalSettings<MCMSettings.MCMSettings>.Instance.Durations;
         public static bool infectedTroopCanInfectOthers = GlobalSettings<MCMSettings.MCMSettings>.Instance.InfectTroopCanInfectOthers;
         public static bool infectedTroopCanBeInfectedAgain = GlobalSettings<MCMSettings.MCMSettings>.Instance.InfectedTroopCanbeInfectedAgain;
-        //public static bool canInfectHero = GlobalSettings<MCMSettings.MCMSettings>.Instance.CanInfectHero;
+        public static string playerSideInfectedTroopContourLineMarking = GlobalSettings<MCMSettings.MCMSettings>.Instance.PlayerSideInfectedTroopContourLineMarking.SelectedValue;
+        public static string enemySideInfectedTroopContourLineMarking = GlobalSettings<MCMSettings.MCMSettings>.Instance.EnemySideInfectedTroopContourLineMarking.SelectedValue;
 
         public static void Postfix(Agent affectedAgent, Agent affectorAgent)
         {
-            if (affectorAgent != null && affectedAgent != null && affectorAgent.Character != null && affectedAgent.Character != null && affectedAgent.IsHuman && !affectedAgent.IsHero)
+            if (MobileParty.MainParty.MapEvent != null)
             {
-                if (affectorAgent.Team.IsValid && affectedAgent.Team.IsValid && affectedAgent.Team.IsEnemyOf(affectorAgent.Team) && (affectedAgent.State == AgentState.Killed || affectedAgent.State == AgentState.Unconscious))
+                if (affectorAgent != null && affectedAgent != null && affectorAgent.Character != null && affectedAgent.Character != null && affectedAgent.IsHuman && !affectedAgent.IsHero)
                 {
-                    if (CheckCharacter(affectorAgent) && CheckBattleType(MobileParty.MainParty.MapEvent.EventType))
+                    if (affectorAgent.Team.IsValid && affectedAgent.Team.IsValid && affectedAgent.Team.IsEnemyOf(affectorAgent.Team) && (affectedAgent.State == AgentState.Killed || affectedAgent.State == AgentState.Unconscious))
                     {
-                        if (CampaignMission.Current.Mode == MissionMode.Tournament || Mission.Current.IsSiegeBattle || MobileParty.MainParty.MapEvent.EventType == MapEvent.BattleTypes.Hideout)
+                        if (CheckCharacter(affectorAgent) && CheckBattleType(MobileParty.MainParty.MapEvent.EventType))
                         {
-                            Infect.SpawnTroop(affectorAgent, affectedAgent, durations, false);
-                        }
-                        else
-                        {
-                            Infect.SpawnTroop(affectorAgent, affectedAgent, durations, true);
+                            if (Mission.Current.IsSiegeBattle || MobileParty.MainParty.MapEvent.EventType == MapEvent.BattleTypes.Hideout)
+                            {
+                                Infect.SpawnTroop(affectorAgent, affectedAgent, durations, false);
+                            }
+                            else
+                            {
+                                Infect.SpawnTroop(affectorAgent, affectedAgent, durations, true);
+                            }
                         }
                     }
                 }
