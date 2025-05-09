@@ -20,7 +20,7 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             if (!InfectPatch.infectedTroopCanInfectOthers && affectorParty.Id.Contains("infected_troop")) return;
             if (!InfectPatch.infectedTroopCanBeInfectedAgain && affectedParty.Id.Contains("infected_troop")) return;
 
-            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 1500)
+            if (affectorParty != null && affectedParty != null && Mission.Current.Agents.Count <= 1800)
             {
                 if (affectorAgent.Character.IsPlayerCharacter || affectorAgent.Name.Contains("女神"))
                 {
@@ -101,68 +101,76 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 }
 
                 // Agent
-                PartyAgentOrigin troopOrigin = new PartyAgentOrigin(infectedPartyBase_Now, @object, -1, default(UniqueTroopDescriptor), false);
-                Agent agent = Mission.Current.SpawnTroop(troopOrigin, isPlayerSide, false, enableMount && @object.HasMount(), false, 1, 1, true, true, false, null, null, null, null, FormationClass.NumberOfAllFormations, false);
-                agent.TeleportToPosition(affectedAgent.Position);
-                agent.Character.IsFemale = true;
-                agent.Formation?.SetMovementOrder(MovementOrder.MovementOrderCharge);
-
-                // Apperance
-                if (isPlayerSide && InfectPatch.playerSideInfectedTroopContourLineMarking != "None")
+                PartyAgentOrigin troopOrigin = new PartyAgentOrigin(infectedPartyBase_Now, @object, -1);
+                if (troopOrigin != null)
                 {
-                    uint color = 0;
-                    switch (InfectPatch.playerSideInfectedTroopContourLineMarking)
+                    Agent agent = Mission.Current.SpawnTroop(troopOrigin, isPlayerSide, false, enableMount && @object.HasMount(), false, 1, 1, true, true, false, null, null, null, null, FormationClass.NumberOfAllFormations, false);
+                    if (agent != null)
                     {
-                        case "Black": color = Colors.Black.ToUnsignedInteger(); break;
-                        case "White": color = Colors.White.ToUnsignedInteger(); break;
-                        case "Red": color = Colors.Red.ToUnsignedInteger(); break;
-                        case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
-                        case "Green": color = Colors.Green.ToUnsignedInteger(); break;
-                        case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
-                        case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
-                        case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
-                        case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
-                    }
-                    MBAgentVisuals agentVisuals = agent.AgentVisuals;
-                    agentVisuals?.SetContourColor(new uint?(color), true);
-                    Agent mountAgent = agent.MountAgent;
-                    if (mountAgent != null)
-                    {
-                        MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
-                        mountAgentVisuals?.SetContourColor(new uint?(color), true);
-                    }
-                }
+                        agent.TeleportToPosition(affectedAgent.Position);
+                        agent.ChangeMorale(100f);
+                        agent.Formation?.SetMovementOrder(MovementOrder.MovementOrderCharge);
+                        agent.Health = InfectPatch.Health;
+                        agent.HealthLimit = InfectPatch.Health;
 
-                if (!isPlayerSide && InfectPatch.enemySideInfectedTroopContourLineMarking != "None")
-                {
-                    uint color = 0;
-                    switch (InfectPatch.enemySideInfectedTroopContourLineMarking)
-                    {
-                        case "Black": color = Colors.Black.ToUnsignedInteger(); break;
-                        case "White": color = Colors.White.ToUnsignedInteger(); break;
-                        case "Red": color = Colors.Red.ToUnsignedInteger(); break;
-                        case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
-                        case "Green": color = Colors.Green.ToUnsignedInteger(); break;
-                        case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
-                        case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
-                        case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
-                        case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
-                    }
-                    MBAgentVisuals agentVisuals = agent.AgentVisuals;
-                    agentVisuals?.SetContourColor(new uint?(color), true);
-                    Agent mountAgent = agent.MountAgent;
-                    if (mountAgent != null)
-                    {
-                        MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
-                        mountAgentVisuals?.SetContourColor(new uint?(color), true);
-                    }
-                }
+                        // Apperance
+                        if (isPlayerSide && InfectPatch.playerSideInfectedTroopContourLineMarking != "None")
+                        {
+                            uint color = 0;
+                            switch (InfectPatch.playerSideInfectedTroopContourLineMarking)
+                            {
+                                case "Black": color = Colors.Black.ToUnsignedInteger(); break;
+                                case "White": color = Colors.White.ToUnsignedInteger(); break;
+                                case "Red": color = Colors.Red.ToUnsignedInteger(); break;
+                                case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
+                                case "Green": color = Colors.Green.ToUnsignedInteger(); break;
+                                case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
+                                case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
+                                case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
+                                case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
+                            }
+                            MBAgentVisuals agentVisuals = agent.AgentVisuals;
+                            agentVisuals?.SetContourColor(new uint?(color), true);
+                            Agent mountAgent = agent.MountAgent;
+                            if (mountAgent != null)
+                            {
+                                MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
+                                mountAgentVisuals?.SetContourColor(new uint?(color), true);
+                            }
+                        }
 
-                // AgentFadOut
-                if (durations > 0)
-                {
-                    AgentFadOutMissionBehaviour agentFadOutMissionBehaviour = new AgentFadOutMissionBehaviour(agent, durations);
-                    Mission.Current.AddMissionBehavior(agentFadOutMissionBehaviour);
+                        if (!isPlayerSide && InfectPatch.enemySideInfectedTroopContourLineMarking != "None")
+                        {
+                            uint color = 0;
+                            switch (InfectPatch.enemySideInfectedTroopContourLineMarking)
+                            {
+                                case "Black": color = Colors.Black.ToUnsignedInteger(); break;
+                                case "White": color = Colors.White.ToUnsignedInteger(); break;
+                                case "Red": color = Colors.Red.ToUnsignedInteger(); break;
+                                case "Yellow": color = Colors.Yellow.ToUnsignedInteger(); break;
+                                case "Green": color = Colors.Green.ToUnsignedInteger(); break;
+                                case "Blue": color = Colors.Blue.ToUnsignedInteger(); break;
+                                case "Cyan": color = Colors.Cyan.ToUnsignedInteger(); break;
+                                case "Magenta": color = Colors.Magenta.ToUnsignedInteger(); break;
+                                case "Gray": color = Colors.Gray.ToUnsignedInteger(); break;
+                            }
+                            MBAgentVisuals agentVisuals = agent.AgentVisuals;
+                            agentVisuals?.SetContourColor(new uint?(color), true);
+                            Agent mountAgent = agent.MountAgent;
+                            if (mountAgent != null)
+                            {
+                                MBAgentVisuals mountAgentVisuals = mountAgent.AgentVisuals;
+                                mountAgentVisuals?.SetContourColor(new uint?(color), true);
+                            }
+                        }
+
+                        // AgentFadOut
+                        if (durations > 0)
+                        {
+                            AgentFadOutMissionBehaviour agentFadOutMissionBehaviour = new AgentFadOutMissionBehaviour(agent, durations);
+                            Mission.Current.AddMissionBehavior(agentFadOutMissionBehaviour);
+                        }
+                    }
                 }
             }
         }

@@ -34,24 +34,17 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         {
             base.OnMissionBehaviorInitialize(mission);
             mission.AddMissionBehavior(new RemovePartyLogic());
-            for (int i = 0; i < Campaign.Current.MobileParties.Count; ++i)
-            {
-                MobileParty mobileParty = Campaign.Current.MobileParties[i];
-                if (mobileParty.Party.Id.ToString().Contains("infected_troop"))
-                {
-                    InformationManager.DisplayMessage(new InformationMessage(mobileParty.Party.Id.ToString()));
-                }
-            }
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
         {
             base.OnGameStart(game, gameStarterObject);
-            for (int i = 0; i < Campaign.Current.MobileParties.Count; ++i)
+            for (int i = 0; i < Campaign.Current.MobileParties.Count; i++)
             {
                 MobileParty mobileParty = Campaign.Current.MobileParties[i];
-                if (mobileParty.Party.Id.ToString().Contains("infected_troop"))
+                if (mobileParty.Party.Id.ToString().Contains("infected"))
                 {
+                    InformationManager.DisplayMessage(new InformationMessage(mobileParty.Party.Id.ToString(),Colors.Black));
                     Campaign.Current.MobileParties.Remove(mobileParty);
                 }
             }

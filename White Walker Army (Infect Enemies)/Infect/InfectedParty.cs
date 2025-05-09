@@ -76,11 +76,11 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             BanditPartyComponent banditPartyComponent = affectorParty.MobileParty.BanditPartyComponent;
             if (banditPartyComponent.Hideout == null)
             {
-                _party = BanditPartyComponent.CreateLooterParty("infected_party", banditPartyComponent.Clan, banditPartyComponent.HomeSettlement, banditPartyComponent.IsBossParty);
+                _party = BanditPartyComponent.CreateLooterParty("infected_troop", banditPartyComponent.Clan, banditPartyComponent.HomeSettlement, banditPartyComponent.IsBossParty);
             }
             else
             {
-                _party = BanditPartyComponent.CreateBanditParty("infected_party", banditPartyComponent.Clan, banditPartyComponent.Hideout, banditPartyComponent.IsBossParty);
+                _party = BanditPartyComponent.CreateBanditParty("infected_troop", banditPartyComponent.Clan, banditPartyComponent.Hideout, banditPartyComponent.IsBossParty);
             }
             InitParty();
         }

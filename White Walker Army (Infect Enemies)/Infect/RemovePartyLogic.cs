@@ -20,9 +20,8 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             for (int i = 0; i < Campaign.Current.MobileParties.Count; ++i)
             {
                 MobileParty mobileParty = Campaign.Current.MobileParties[i];
-                if (mobileParty.Party.Id.ToString().Contains("infected_troop"))
+                if (mobileParty.Party.Id.ToString().Contains("infected"))
                 {
-                    mobileParty.MapEventSide = null;
                     Campaign.Current.MobileParties.Remove(mobileParty);
                 }
             }

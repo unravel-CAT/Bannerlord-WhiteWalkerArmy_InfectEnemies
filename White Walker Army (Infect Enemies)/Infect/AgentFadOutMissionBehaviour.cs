@@ -41,6 +41,11 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
 
         public override void OnMissionTick(float dt)
         {
+            base.OnMissionTick(dt);
+            if (Mission.Current != null && Mission.Current.Mode == MissionMode.CutScene)
+            {
+                _hasFadOut = true;
+            }
             _durations -= dt;
             if (_durations < 0f && !_hasFadOut && _agent != null && Mission.Current != null)
             {
@@ -55,7 +60,12 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
                 }
             }
         }
-      
+
+        protected override void OnEndMission()
+        {
+            base.OnEndMission();
+        }
+
         private float _durations;
         private readonly Agent _agent;
         private bool _hasFadOut;

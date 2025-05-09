@@ -13,6 +13,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.TournamentGames;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using White_Walker_Army__Infect_Enemies_.MCMSettings;
 
@@ -43,6 +44,9 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         public static bool infectedTroopCanBeInfectedAgain = GlobalSettings<MCMSettings.MCMSettings>.Instance.InfectedTroopCanbeInfectedAgain;
         public static string playerSideInfectedTroopContourLineMarking = GlobalSettings<MCMSettings.MCMSettings>.Instance.PlayerSideInfectedTroopContourLineMarking.SelectedValue;
         public static string enemySideInfectedTroopContourLineMarking = GlobalSettings<MCMSettings.MCMSettings>.Instance.EnemySideInfectedTroopContourLineMarking.SelectedValue;
+        public static int Health = GlobalSettings<MCMSettings.MCMSettings>.Instance.Health;
+        public static float DamageMultiplier = GlobalSettings<MCMSettings.MCMSettings>.Instance.DamageMultiplier;
+        public static float DamageTakenMultiplier = GlobalSettings<MCMSettings.MCMSettings>.Instance.DamageTakenMultiplier;
 
         public static void Postfix(Agent affectedAgent, Agent affectorAgent)
         {
@@ -71,27 +75,30 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
         public static bool CheckCharacter(Agent affectorAgent)
         {
             PartyBase affectorParty = Infect.GetaffectorParty(affectorAgent);
-            // Player
-            if (enablePlayer && affectorAgent.IsMainAgent)
-                return true;
-            // PlayerTeamHero
-            if (enablePlayerTeamHero && affectorAgent.IsHero && !affectorAgent.IsMainAgent && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
-                return true;
-            // PlayerTeamSolider
-            if (enablePlayerTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
-                return true;
-            //AllyTeamHero
-            if (enableAllyTeamHero && affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
-                return true;
-            // AllyTeamSolider
-            if (enableAllyTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
-                return true;
-            // EnemyTeamHero
-            if (enableEnemyTeamHero && affectorAgent.IsHero && affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide.OtherSide)
-                return true;
-            // EnemyTeamSolider
-            if (enableEnemyTeamSolider && !affectorAgent.IsHero && affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide.OtherSide)
-                return true;
+            if (affectorParty != null && affectorAgent.Team != null)
+            {
+                // Player
+                if (enablePlayer && affectorAgent.IsMainAgent)
+                    return true;
+                // PlayerTeamHero
+                if (enablePlayerTeamHero && affectorAgent.IsHero && !affectorAgent.IsMainAgent && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
+                    return true;
+                // PlayerTeamSolider
+                if (enablePlayerTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerTeam && affectorParty.MobileParty.IsMainParty)
+                    return true;
+                //AllyTeamHero
+                if (enableAllyTeamHero && affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
+                    return true;
+                // AllyTeamSolider
+                if (enableAllyTeamSolider && !affectorAgent.IsHero && affectorAgent.Team.IsPlayerAlly && !affectorParty.MobileParty.IsMainParty)
+                    return true;
+                // EnemyTeamHero
+                if (enableEnemyTeamHero && affectorAgent.IsHero && !affectorAgent.Team.IsPlayerAlly && affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide.OtherSide)
+                    return true;
+                // EnemyTeamSolider
+                if (enableEnemyTeamSolider && !affectorAgent.IsHero && !affectorAgent.Team.IsPlayerAlly && affectorParty.MapEventSide == MobileParty.MainParty.Party.MapEventSide.OtherSide)
+                    return true;
+            }
             return false;
         }
 
@@ -101,6 +108,9 @@ namespace White_Walker_Army__Infect_Enemies_.Infect
             switch (mapEvent)
             {
                 case MapEvent.BattleTypes.FieldBattle:
+                case MapEvent.BattleTypes.IsForcingVolunteers:
+                case MapEvent.BattleTypes.IsForcingSupplies:
+                case MapEvent.BattleTypes.Raid:
                     result = enableInField;
                     break;
                 case MapEvent.BattleTypes.Siege:

@@ -110,10 +110,6 @@ namespace White_Walker_Army__Infect_Enemies_.MCMSettings
         [SettingPropertyGroup("Settings")]
         public bool InfectedTroopCanbeInfectedAgain { get; set; } = false;
 
-        [SettingPropertyBool("{=WWA_ITCLM}Infected Troop Contour Line Marking", HintText = "{=WWA_ITCLM_Hint}Infected units will be marked with a blue outline[ Default: ON ].", Order = 4, RequireRestart = true)]
-        [SettingPropertyGroup("Settings")]
-        public bool InfectedTroopContourLintMarking { get; set; } = true;
-
         [SettingPropertyDropdown("{=WWA_PITCLM}PlayerSide Infected Troop Contour Line Marking", HintText = "{=WWA_PITCLM_Hint}PlayerSide Infected units will be marked with an outline of the selected color.", Order = 4, RequireRestart = true)]
         [SettingPropertyGroup("Settings")]
         public Dropdown<String> PlayerSideInfectedTroopContourLineMarking { get; set; } = new Dropdown<string>(new string[]
@@ -124,8 +120,16 @@ namespace White_Walker_Army__Infect_Enemies_.MCMSettings
         public Dropdown<String> EnemySideInfectedTroopContourLineMarking { get; set; } = new Dropdown<string>(new string[]
         {"None", "Black", "White", "Red", "Yellow", "Green", "Blue", "Cyan", "Magenta", "Gray",}, selectedIndex: 6);
 
-        //[SettingPropertyBool("{=WWA_CIH}Can Infect Hero", HintText = "{=WWA_CIH_Hint}Hero can be infected[ Default: OFF ].", Order = 4, RequireRestart = true)]
-        //[SettingPropertyGroup("Settings")]
-        //public bool CanInfectHero { get; set; } = false;
+        [SettingPropertyInteger("{=WWA_H}Health", 1, 10000, HintText = "{=WWA_H_Hint}Initial health of infected units[ Default: 100 ].", Order = 6, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public int Health { get; set; } = 100;
+
+        [SettingPropertyFloatingInteger("{=WWA_DM}DamageMultiplier", 0.01f, 100.0f, HintText = "{=WWA_DM_Hint}Damage multiplier for infected units[ Default: 1.0 ].", Order = 8, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public float DamageMultiplier { get; set; } = 1.0f;
+
+        [SettingPropertyFloatingInteger("{=WWA_DTM}DamageTakenMultiplier", 0.01f, 100.0f, HintText = "{=WWA_DTM_Hint}Damage taken multiplier for infected units[ Default: 1.0 ].", Order = 9, RequireRestart = true)]
+        [SettingPropertyGroup("Settings")]
+        public float DamageTakenMultiplier { get; set; } = 1.0f;
     }
 }
